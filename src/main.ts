@@ -1,3 +1,7 @@
-const hello: string = "hello world";
+import "dotenv/config";
+import app from "./application/web";
 
-console.info(hello);
+const port: number = process.env.PORT ? parseInt(process.env.PORT) : 8080;
+app.listen(port, (): void => {
+  console.info(`Listening application in port ${port}`);
+});
