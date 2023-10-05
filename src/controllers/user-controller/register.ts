@@ -15,7 +15,7 @@ const register = async (req: Request, res: Response) => {
     return res.status(201).send({
       status_response: true,
       data: {
-        id: user._id.toString(),
+        _id: user._id.toString(),
         username: user.username,
         email: user.email,
       },
