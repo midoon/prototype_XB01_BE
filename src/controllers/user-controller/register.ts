@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import User from "../../Models/user.model";
-import { registerUserValidation } from "../../validations/user,validation";
+import { registerUserValidation } from "../../validations/user.validation";
 import { registerUser } from "../../services/user.service";
 import { hashPassword } from "../../utils/hash";
 

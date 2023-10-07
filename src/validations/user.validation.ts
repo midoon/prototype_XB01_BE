@@ -10,3 +10,12 @@ export const registerUserValidation = (payload: UserInterface) => {
 
   return schema.validate(payload, { abortEarly: false });
 };
+
+export const loginUserValidation = (payload: UserInterface) => {
+  const schema = Joi.object({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  });
+
+  return schema.validate(payload, { abortEarly: false });
+};
