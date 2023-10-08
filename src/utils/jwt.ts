@@ -1,3 +1,4 @@
+import "dotenv/config";
 import jwt from "jsonwebtoken";
 
 export const signJwt = (payload: object, expiresIn: string) => {
