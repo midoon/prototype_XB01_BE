@@ -22,3 +22,7 @@ export const countToken = async (userId: string) => {
 export const updateToken = async (userId: string, payload: TokenInterface) => {
   return await Token.updateOne({ user: userId }, payload);
 };
+
+export const deleteToken = async (userId: string) => {
+  return await Token.deleteOne({ user: userId });
+};
