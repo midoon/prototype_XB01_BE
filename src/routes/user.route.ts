@@ -6,6 +6,6 @@ const userRouter: Router = Router();
 
 userRouter.post("/api/user/register", register);
 userRouter.post("/api/user/login", login);
-userRouter.post("/api/user/refresh", authMiddleware, refreshToken);
+userRouter.post("/api/user/refresh", refreshToken);
 
 export default userRouter;

@@ -48,6 +48,11 @@ describe("POST: /api/user/register", () => {
 describe("POST /api/user/login", () => {
   beforeAll(async () => {
     await connectMongoServerTest();
+    await supertest(app).post("/api/user/register").send({
+      username: "test",
+      email: "test@gmail.com",
+      password: "12345678",
+    });
   });
 
   afterAll(async () => {
@@ -55,12 +60,6 @@ describe("POST /api/user/login", () => {
   });
 
   it("should can login user", async () => {
-    await supertest(app).post("/api/user/register").send({
-      username: "test",
-      email: "test@gmail.com",
-      password: "12345678",
-    });
-
     const result = await supertest(app).post("/api/user/login").send({
       email: "test@gmail.com",
       password: "12345678",
@@ -100,5 +99,48 @@ describe("POST /api/user/login", () => {
 
     expect(result.status).toBe(400);
     expect(result.body.status_response).toBe(false);
+  });
+});
+
+describe("POST: /api/user/refresh", () => {
+  beforeAll(async () => {
+    await connectMongoServerTest();
+    await supertest(app).post("/api/user/register").send({
+      username: "test",
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+  });
+
+  afterAll(async () => {
+    await disconnectMongoServerTest();
+  });
+
+  it("should can login user", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+
+    const result = await supertest(app).post("/api/user/refresh").send({
+      refresh_token: loggedUser.body.data.refresh_token,
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data.access_token).toBeDefined();
+  });
+
+  it("should reject if req body field is empty", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+
+    const result = await supertest(app).post("/api/user/refresh");
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+    expect(result.body.error).toBe("Validation Error");
   });
 });
