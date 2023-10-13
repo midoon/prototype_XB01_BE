@@ -144,3 +144,57 @@ describe("POST: /api/user/refresh", () => {
     expect(result.body.error).toBe("Validation Error");
   });
 });
+
+describe("POST: /api/user/logout", () => {
+  beforeAll(async () => {
+    await connectMongoServerTest();
+    await supertest(app).post("/api/user/register").send({
+      username: "test",
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+  });
+
+  afterAll(async () => {
+    await disconnectMongoServerTest();
+  });
+
+  it("should can logout user", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+
+    const result = await supertest(app)
+      .post("/api/user/logout")
+      .set("Authorization", `Bearer ${loggedUser.body.data.access_token}`);
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+  });
+
+  it("should reject logout user if double logout", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+
+    await supertest(app)
+      .post("/api/user/logout")
+      .set("Authorization", `Bearer ${loggedUser.body.data.access_token}`);
+
+    const result = await supertest(app)
+      .post("/api/user/logout")
+      .set("Authorization", `Bearer ${loggedUser.body.data.access_token}`);
+
+    expect(result.status).toBe(403);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject logout if without access token", async () => {
+    const result = await supertest(app).post("/api/user/logout");
+
+    expect(result.status).toBe(403);
+    expect(result.body.status_response).toBe(false);
+  });
+});
