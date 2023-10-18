@@ -26,3 +26,9 @@ export const updateToken = async (userId: string, payload: TokenInterface) => {
 export const deleteToken = async (userId: string) => {
   return await Token.deleteOne({ user: userId });
 };
+
+export const findAllUser = async (keyword: object, logedUid: string) => {
+  return await User.find(keyword)
+    .find({ _id: { $ne: logedUid } })
+    .select("-password");
+};
