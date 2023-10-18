@@ -198,3 +198,75 @@ describe("POST: /api/user/logout", () => {
     expect(result.body.status_response).toBe(false);
   });
 });
+
+describe("GET: /api/user", () => {
+  beforeAll(async () => {
+    await connectMongoServerTest();
+    await supertest(app).post("/api/user/register").send({
+      username: "test",
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+    await supertest(app).post("/api/user/register").send({
+      username: "test2",
+      email: "test2@gmail.com",
+      password: "12345678",
+    });
+    await supertest(app).post("/api/user/register").send({
+      username: "coba",
+      email: "coba@gmail.com",
+      password: "12345678",
+    });
+  });
+
+  afterAll(async () => {
+    await disconnectMongoServerTest();
+  });
+
+  it("should can get list user without query params", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+
+    const result = await supertest(app)
+      .get("/api/user")
+      .set("Authorization", `Bearer ${loggedUser.body.data.access_token}`);
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data.length).toBe(2);
+  });
+
+  it("should can get list user with query params", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+
+    const result = await supertest(app)
+      .get("/api/user")
+      .set("Authorization", `Bearer ${loggedUser.body.data.access_token}`)
+      .query({ search: "coba" });
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data.length).toBe(1);
+  });
+
+  it("should can get zero list user with query params that no user stored", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test@gmail.com",
+      password: "12345678",
+    });
+
+    const result = await supertest(app)
+      .get("/api/user")
+      .set("Authorization", `Bearer ${loggedUser.body.data.access_token}`)
+      .query({ search: "salah" });
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data.length).toBe(0);
+  });
+});
