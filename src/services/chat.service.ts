@@ -29,3 +29,19 @@ export const createChat = async (payload: any) => {
 export const findOneChatById = async (chatId: string) => {
   return await Chat.findOne({ _id: chatId }).populate("users", "-password");
 };
+
+export const fetchAllChat = async (logedUserId: string) => {
+  let allChat: any = await Chat.find({
+    users: { $elemMatch: { $eq: logedUserId } },
+  })
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password")
+    .populate("latestMessage")
+    .sort({ updatedAt: -1 });
+  allChat = await User.populate(allChat, {
+    path: "latestMessage.sender",
+    select: "name pic email",
+  });
+
+  return allChat;
+};

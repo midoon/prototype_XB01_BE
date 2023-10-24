@@ -1,3 +1,3 @@
 import accessChat from "./chat-controller/accessChat";
-
-export { accessChat };
+import fetchChat from "./chat-controller/fetchAllChat";
+export { accessChat, fetchChat };
