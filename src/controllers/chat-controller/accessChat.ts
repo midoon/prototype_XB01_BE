@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import { accessChatValidation } from "../../validations/chat.validation";
-import Chat from "../../Models/chat.model";
-import User from "../../Models/user.model";
 import { ChatDataInterface } from "../../types/chat.type";
+import {
+  createChat,
+  findExistChat,
+  findOneChatById,
+} from "../../services/chat.service";
 //@description     Create or fetch One to One Chat
 
 const accessChat = async (req: Request, res: Response) => {
@@ -12,19 +15,7 @@ const accessChat = async (req: Request, res: Response) => {
       throw new Error("Validation error");
     }
     const logedUser: any = res.locals.user;
-    let isChat: any = await Chat.find({
-      isGroupChat: false,
-      $and: [
-        { users: { $elemMatch: { $eq: logedUser._id } } },
-        { users: { $elemMatch: { $eq: value.user_id } } },
-      ],
-    })
-      .populate("users", "-password")
-      .populate("latestMessage");
-    isChat = await User.populate(isChat, {
-      path: "latestMessage.sender",
-      select: "name pic email",
-    });
+    let isChat: any = await findExistChat(logedUser._id, value.user_id);
     if (isChat.length > 0) {
       return res.status(200).send({
         status_response: true,
@@ -36,11 +27,8 @@ const accessChat = async (req: Request, res: Response) => {
       isGroupChat: false,
       users: [logedUser._id, value.user_id],
     };
-    const createdChat: any = await Chat.create(chatData);
-    const FullChat: any = await Chat.findOne({ _id: createdChat._id }).populate(
-      "users",
-      "-password"
-    );
+    const createdChat: any = await createChat(chatData);
+    const FullChat: any = await findOneChatById(createdChat._id);
     return res.status(200).send({
       status_response: true,
       data: FullChat,
