@@ -7,3 +7,8 @@ export interface ChatDataInterface {
   isGroupChat: boolean;
   users: any[];
 }
+
+export interface GroupChatInterface {
+  group_name: string;
+  users: string;
+}

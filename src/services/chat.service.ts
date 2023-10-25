@@ -45,3 +45,9 @@ export const fetchAllChat = async (logedUserId: string) => {
 
   return allChat;
 };
+
+export const findOneGroupChat = async (groupChatId: string) => {
+  return await Chat.findOne({ _id: groupChatId })
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+};

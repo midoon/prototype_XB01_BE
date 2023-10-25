@@ -1,3 +1,4 @@
 import accessChat from "./chat-controller/accessChat";
 import fetchChat from "./chat-controller/fetchAllChat";
-export { accessChat, fetchChat };
+import createGroup from "./chat-controller/createGroup";
+export { accessChat, fetchChat, createGroup };
