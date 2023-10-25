@@ -6,14 +6,7 @@ import {
 } from "./test-util";
 import app from "../src/application/web";
 
-// const createUser = async () => {
-//   await supertest(app).post("/api/user/register").send({
-//     username: "test1",
-//     email: "test1@gmail.com",
-//     password: "12345678",
-//   });
-// };
-
+// create and fetch one chat
 describe("POST /api/chat", () => {
   beforeAll(async () => {
     await connectMongoServerTest();
@@ -98,6 +91,52 @@ describe("POST /api/chat", () => {
       })
       .set("Authorization", `Bearer ${accessToken}`);
     expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+});
+
+// fetch all chat
+describe("GET: /api/chat", () => {
+  beforeAll(async () => {
+    await connectMongoServerTest();
+    await createUser();
+  });
+
+  afterAll(async () => {
+    await disconnectMongoServerTest();
+  });
+  it("should can fetch all chat", async () => {
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const user2 = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+    const chat = await supertest(app)
+      .post("/api/chat/")
+      .send({
+        user_id: user2.body.data.user_id,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const result = await supertest(app)
+      .get("/api/chat")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data).toBeDefined();
+  });
+
+  it("should reject if user unauthorized", async () => {
+    const result = await supertest(app).get("/api/chat");
+
+    expect(result.status).toBe(403);
     expect(result.body.status_response).toBe(false);
   });
 });
