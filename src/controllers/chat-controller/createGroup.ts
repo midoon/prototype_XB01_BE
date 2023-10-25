@@ -8,7 +8,6 @@ const createGroup = async (req: Request, res: Response) => {
     if (error) throw new Error("Validation errror");
     // req body users dari client bertipe json.stringify
     let users: any = JSON.parse(value.users);
-    console.log(users);
     if (users.length < 2) throw new Error("More than 2 users are required");
     users.push(res.locals.user);
 
