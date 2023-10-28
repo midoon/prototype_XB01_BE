@@ -7,7 +7,7 @@ import {
 
 export const accessChatValidation = (payload: AccessChatInterface) => {
   const schema = Joi.object({
-    user_id: Joi.string().required(),
+    userId: Joi.string().required(),
   });
 
   return schema.validate(payload, { abortEarly: false });
@@ -15,7 +15,7 @@ export const accessChatValidation = (payload: AccessChatInterface) => {
 
 export const createGroupChatValidation = (payload: GroupChatInterface) => {
   const schema = Joi.object({
-    group_name: Joi.string().required(),
+    groupName: Joi.string().required(),
     users: Joi.string().required(),
   });
 

@@ -15,7 +15,7 @@ const accessChat = async (req: Request, res: Response) => {
       throw new Error("Validation error");
     }
     const logedUser: any = res.locals.user;
-    let isChat: any = await findExistChat(logedUser._id, value.user_id);
+    let isChat: any = await findExistChat(logedUser._id, value.userId);
     if (isChat.length > 0) {
       return res.status(200).send({
         status_response: true,
@@ -25,7 +25,7 @@ const accessChat = async (req: Request, res: Response) => {
     const chatData: ChatDataInterface = {
       chatName: "sender",
       isGroupChat: false,
-      users: [logedUser._id, value.user_id],
+      users: [logedUser._id, value.userId],
     };
     const createdChat: any = await createChat(chatData);
     const FullChat: any = await findOneChatById(createdChat._id);

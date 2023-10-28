@@ -32,7 +32,7 @@ describe("POST /api/chat", () => {
     const result = await supertest(app)
       .post("/api/chat/")
       .send({
-        user_id: user2.body.data.user_id,
+        userId: user2.body.data.user_id,
       })
       .set("Authorization", `Bearer ${accessToken}`);
     expect(result.status).toBe(200);
@@ -56,7 +56,7 @@ describe("POST /api/chat", () => {
     const result = await supertest(app)
       .post("/api/chat/")
       .send({
-        user_id: user2.body.data.user_id,
+        userId: user2.body.data.user_id,
       })
       .set("Authorization", `Bearer ${accessToken}`);
     expect(result.status).toBe(200);

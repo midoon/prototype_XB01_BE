@@ -12,7 +12,7 @@ const createGroup = async (req: Request, res: Response) => {
     users.push(res.locals.user);
 
     const groupChatData: object = {
-      chatName: value.group_name,
+      chatName: value.groupName,
       users: users,
       isGroupChat: true,
       groupAdmin: res.locals.user,

@@ -1,5 +1,5 @@
 export interface AccessChatInterface {
-  user_id: string;
+  userId: string;
 }
 
 export interface ChatDataInterface {
@@ -9,7 +9,7 @@ export interface ChatDataInterface {
 }
 
 export interface GroupChatInterface {
-  group_name: string;
+  groupName: string;
   users: string;
 }
 
