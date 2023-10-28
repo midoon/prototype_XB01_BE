@@ -1,5 +1,9 @@
 import Joi from "joi";
-import { AccessChatInterface, GroupChatInterface } from "../types/chat.type";
+import {
+  AccessChatInterface,
+  GroupChatInterface,
+  RenameGroupInterface,
+} from "../types/chat.type";
 
 export const accessChatValidation = (payload: AccessChatInterface) => {
   const schema = Joi.object({
@@ -13,6 +17,15 @@ export const createGroupChatValidation = (payload: GroupChatInterface) => {
   const schema = Joi.object({
     group_name: Joi.string().required(),
     users: Joi.string().required(),
+  });
+
+  return schema.validate(payload, { abortEarly: false });
+};
+
+export const renameGroupValidation = (payload: RenameGroupInterface) => {
+  const schema = Joi.object({
+    groupName: Joi.string().required(),
+    chatId: Joi.string().required(),
   });
 
   return schema.validate(payload, { abortEarly: false });

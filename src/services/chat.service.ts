@@ -51,3 +51,13 @@ export const findOneGroupChat = async (groupChatId: string) => {
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 };
+
+export const renameGroupById = async (groupName: string, chatId: string) => {
+  return await Chat.findByIdAndUpdate(
+    chatId,
+    { chatName: groupName },
+    { new: true }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+};
