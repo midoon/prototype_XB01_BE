@@ -61,3 +61,31 @@ export const renameGroupById = async (groupName: string, chatId: string) => {
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 };
+
+export const removeUserById = async (chatId: string, userId: string) => {
+  return await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $pull: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+};
+
+export const addUserById = async (chatId: string, userId: string) => {
+  return await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $push: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+};
