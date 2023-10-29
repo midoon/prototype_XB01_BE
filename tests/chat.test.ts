@@ -3,6 +3,7 @@ import {
   connectMongoServerTest,
   disconnectMongoServerTest,
   createUser,
+  getAllUserId,
 } from "./test-util";
 import app from "../src/application/web";
 
@@ -135,6 +136,151 @@ describe("GET: /api/chat", () => {
 
   it("should reject if user unauthorized", async () => {
     const result = await supertest(app).get("/api/chat");
+
+    expect(result.status).toBe(403);
+    expect(result.body.status_response).toBe(false);
+  });
+});
+
+// create Group
+describe("POST: /api/chat/group", () => {
+  beforeAll(async () => {
+    await connectMongoServerTest();
+    await createUser();
+  });
+
+  afterAll(async () => {
+    await disconnectMongoServerTest();
+  });
+
+  it("should can create user group", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const result = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.body.data.groupAdmin._id).toBe(loggedUser.body.data.user_id);
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data).toBeDefined();
+  });
+
+  it("should can create user group", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const result = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data).toBeDefined();
+  });
+
+  it("should reject create user group if member less than 2", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const result = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject create user group if member id not found", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), "salah id"];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const result = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject create user group if empty req body", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), "salah id"];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const result = await supertest(app)
+      .post("/api/chat/group")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject create user group if user unauthorized", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), "salah id"];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const result = await supertest(app).post("/api/chat/group").send({
+      groupName: "testGroup",
+      users: uidArrStr,
+    });
 
     expect(result.status).toBe(403);
     expect(result.body.status_response).toBe(false);

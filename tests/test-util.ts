@@ -25,4 +25,29 @@ export const createUser = async () => {
     username: "tets2",
     password: `${hashPassword("12345678")}`,
   });
+
+  await User.create({
+    email: "test3@gmail.com",
+    username: "tets3",
+    password: `${hashPassword("12345678")}`,
+  });
+
+  await User.create({
+    email: "test4@gmail.com",
+    username: "tets4",
+    password: `${hashPassword("12345678")}`,
+  });
+};
+
+export const getAllUserId = async () => {
+  const user1: any = await User.findOne({ email: "test1@gmail.com" });
+  const user2: any = await User.findOne({ email: "test2@gmail.com" });
+  const user3: any = await User.findOne({ email: "test3@gmail.com" });
+  const user4: any = await User.findOne({ email: "test4@gmail.com" });
+  return {
+    id1: user1._id,
+    id2: user2._id,
+    id3: user3._id,
+    id4: user4._id,
+  };
 };
