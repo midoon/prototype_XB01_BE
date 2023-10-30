@@ -286,3 +286,141 @@ describe("POST: /api/chat/group", () => {
     expect(result.body.status_response).toBe(false);
   });
 });
+
+//RENAME GROUP
+describe("PUT: /api/chat/group/rename", () => {
+  beforeAll(async () => {
+    await connectMongoServerTest();
+    await createUser();
+  });
+
+  afterAll(async () => {
+    await disconnectMongoServerTest();
+  });
+
+  it("should can rename group", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const result = await supertest(app)
+      .put("/api/chat/group/rename")
+      .send({
+        groupName: "testGroupRename",
+        chatId: `${createdGroup.body.data._id}`,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.body.data.groupAdmin._id).toBe(loggedUser.body.data.user_id);
+    expect(result.body.data.chatName).toBe("testGroupRename");
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data).toBeDefined();
+  });
+
+  it("should reject rename group if chatId notfound", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const result = await supertest(app)
+      .put("/api/chat/group/rename")
+      .send({
+        groupName: "testGroupRename",
+        chatId: `${createdGroup.body.data._id}x`,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject rename group if empty request body", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const result = await supertest(app)
+      .put("/api/chat/group/rename")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject rename group if user Unauthorized", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const result = await supertest(app)
+      .put("/api/chat/group/rename")
+      .send({
+        groupName: "testGroupRename",
+        chatId: `${createdGroup.body.data._id}x`,
+      });
+
+    expect(result.status).toBe(403);
+    expect(result.body.status_response).toBe(false);
+  });
+});
