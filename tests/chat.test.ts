@@ -424,3 +424,181 @@ describe("PUT: /api/chat/group/rename", () => {
     expect(result.body.status_response).toBe(false);
   });
 });
+
+//Add meber group
+describe("PUT: /api/chat/group/add ", () => {
+  beforeAll(async () => {
+    await connectMongoServerTest();
+    await createUser();
+  });
+
+  afterAll(async () => {
+    await disconnectMongoServerTest();
+  });
+
+  it("should add group member", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const groupId = createdGroup.body.data._id;
+
+    const result = await supertest(app)
+      .put("/api/chat/group/add")
+      .send({
+        chatId: groupId,
+        userId: uid.id4,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(200);
+    expect(result.body.status_response).toBe(true);
+    expect(result.body.data).toBeDefined();
+  });
+
+  it("should reject add group member if uid wrong", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const groupId = createdGroup.body.data._id;
+
+    const result = await supertest(app)
+      .put("/api/chat/group/add")
+      .send({
+        chatId: groupId,
+        userId: uid.id4 + "x",
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject add group member if chatId wrong", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const groupId = createdGroup.body.data._id;
+
+    const result = await supertest(app)
+      .put("/api/chat/group/add")
+      .send({
+        chatId: groupId + "x",
+        userId: uid.id4,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject add group member if empty req body", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const groupId = createdGroup.body.data._id;
+
+    const result = await supertest(app)
+      .put("/api/chat/group/add")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(result.status).toBe(400);
+    expect(result.body.status_response).toBe(false);
+  });
+
+  it("should reject add group member if user unauthorized", async () => {
+    const uid = await getAllUserId();
+    const uidArr = [uid.id2.toString(), uid.id3.toString()];
+    const uidArrStr = JSON.stringify(uidArr);
+
+    const loggedUser = await supertest(app).post("/api/user/login").send({
+      email: "test1@gmail.com",
+      password: "12345678",
+    });
+
+    const accessToken = loggedUser.body.data.access_token;
+
+    const createdGroup = await supertest(app)
+      .post("/api/chat/group")
+      .send({
+        groupName: "testGroup",
+        users: uidArrStr,
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    const groupId = createdGroup.body.data._id;
+
+    const result = await supertest(app)
+      .put("/api/chat/group/add")
+      .send({
+        chatId: groupId + "x",
+        userId: uid.id4,
+      });
+
+    expect(result.status).toBe(403);
+    expect(result.body.status_response).toBe(false);
+  });
+});
