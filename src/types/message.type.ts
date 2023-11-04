@@ -6,5 +6,5 @@ export interface CreateMessageInterface {
 export interface StoreMessageInterface {
   sender: string;
   content: string;
-  chatId: string;
+  chat: string;
 }

@@ -11,7 +11,7 @@ const sendMessage = async (req: Request, res: Response) => {
     let newMessageData: StoreMessageInterface = {
       sender: res.locals.user._id,
       content: value.content,
-      chatId: value.chatId,
+      chat: value.chatId,
     };
 
     const message = await storeMessage(newMessageData);
