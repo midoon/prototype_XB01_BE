@@ -89,3 +89,10 @@ export const addUserById = async (chatId: string, userId: string) => {
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 };
+
+export const updateLatestMessageChate = async (
+  chatId: string,
+  latestMessage: object
+) => {
+  return await Chat.findByIdAndUpdate(chatId, { latestMessage: latestMessage });
+};
