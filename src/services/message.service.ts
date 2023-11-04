@@ -13,3 +13,11 @@ export const storeMessage = async (payload: StoreMessageInterface) => {
 
   return message;
 };
+
+export const fetchAllMessage = async (chatId: string) => {
+  const message = await Message.find({ chat: chatId })
+    .populate("sender", "name pic email")
+    .populate("chat");
+
+  return message;
+};
