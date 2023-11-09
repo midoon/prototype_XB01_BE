@@ -7,4 +7,6 @@ export interface StoreMessageInterface {
   sender: string;
   content: string;
   chat: string;
+  sentiment: string;
+  accuracy: number;
 }
